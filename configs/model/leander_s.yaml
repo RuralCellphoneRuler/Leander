@@ -1,0 +1,51 @@
+# Leander-S: Small 0.6B configuration
+model:
+  name: "leander-s"
+
+  lm:
+    backbone: "Qwen/Qwen3-0.6B"
+    d_model: 1024
+    n_layers: 28
+    n_heads: 16
+    n_kv_heads: 4
+    intermediate_size: 3072
+    max_seq_len: 4096
+    rope_theta: 1000000.0
+
+  vocab:
+    original_size: 151936
+    snac_codebook_size: 4096
+    snac_levels: 3
+    n_emotion_tags: 20
+    n_special_tokens: 9
+    total_new_tokens: 12317
+
+  speaker_encoder:
+    n_layers: 4
+    d_model: 512
+    n_heads: 8
+    output_dim: 1024
+    pool_type: "cross_attention"
+
+  speaker_injection:
+    inject_every_n_layers: 4
+    n_injection_points: 7
+    d_model: 1024
+
+  detokenizer:
+    n_layers: 6
+    channels: 384
+    kernel_size: 7
+    dilations: [1, 2, 4, 8, 1, 2]
+    activation: "snake"
+    window_size: 16
+    sample_rate: 24000
+    upsample_rates: [8, 5, 4, 2]
+
+  codec:
+    model: "hubertsiuzdak/snac_24khz"
+    sample_rate: 24000
+    codebook_size: 4096
+    n_levels: 3
+    frame_rates: [12, 23, 47]
+    tokens_per_frame: 7

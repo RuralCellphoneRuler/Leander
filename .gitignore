@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+dist/
+build/
+*.pt
+*.ckpt
+data/
+checkpoints/
+wandb/
+output*.wav

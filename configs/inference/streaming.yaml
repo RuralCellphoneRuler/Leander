@@ -1,0 +1,26 @@
+# Streaming inference configuration
+inference:
+  model_config: "configs/model/leander_m.yaml"
+
+  checkpoint: "checkpoints/phase5/best.pt"
+
+  generation:
+    max_new_tokens: 4096
+    temperature: 0.7
+    top_k: 50
+    top_p: 0.95
+    repetition_penalty: 1.1
+    do_sample: true
+
+  streaming:
+    enabled: true
+    frames_before_output: 1  # start output after 1 frame (~83ms)
+    detokenizer_window: 16   # sliding window context
+
+  speaker:
+    min_ref_duration: 3.0
+    max_ref_duration: 10.0
+    default_ref: null  # path to default reference audio
+
+  device: "cuda"
+  dtype: "bfloat16"

@@ -1,0 +1,57 @@
+# Leander-M: Primary 1.5B configuration
+model:
+  name: "leander-m"
+
+  # LLM backbone
+  lm:
+    backbone: "Qwen/Qwen2.5-1.5B"
+    d_model: 1536
+    n_layers: 28
+    n_heads: 12
+    n_kv_heads: 2  # GQA
+    intermediate_size: 8960
+    max_seq_len: 4096
+    rope_theta: 1000000.0
+
+  # Vocabulary extension
+  vocab:
+    original_size: 151936
+    snac_codebook_size: 4096
+    snac_levels: 3
+    n_emotion_tags: 20
+    n_special_tokens: 9  # BOS, EOS, AUDIO_START, AUDIO_END, L1_START, L2_START, L3_START, PAD, SPEAKER_START
+    total_new_tokens: 12317  # 3*4096 + 20 + 9
+
+  # Speaker encoder
+  speaker_encoder:
+    n_layers: 6
+    d_model: 768
+    n_heads: 8
+    output_dim: 1536  # match LM d_model
+    pool_type: "cross_attention"  # learnable query pooling
+
+  # Speaker cross-attention injection
+  speaker_injection:
+    inject_every_n_layers: 4  # inject at layers 3, 7, 11, 15, 19, 23, 27
+    n_injection_points: 7
+    d_model: 1536
+
+  # Streaming detokenizer
+  detokenizer:
+    n_layers: 8
+    channels: 512
+    kernel_size: 7
+    dilations: [1, 2, 4, 8, 1, 2, 4, 8]
+    activation: "snake"
+    window_size: 16  # frames of context
+    sample_rate: 24000
+    upsample_rates: [8, 5, 4, 2]  # product = 320 (24000 / 75 Hz base)
+
+  # SNAC codec
+  codec:
+    model: "hubertsiuzdak/snac_24khz"
+    sample_rate: 24000
+    codebook_size: 4096
+    n_levels: 3
+    frame_rates: [12, 23, 47]  # Hz per level
+    tokens_per_frame: 7  # 1 + 2 + 4

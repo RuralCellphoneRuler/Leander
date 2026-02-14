@@ -1,0 +1,51 @@
+# Leander-L: Large 3B configuration
+model:
+  name: "leander-l"
+
+  lm:
+    backbone: "Qwen/Qwen2.5-3B"
+    d_model: 2048
+    n_layers: 36
+    n_heads: 16
+    n_kv_heads: 2
+    intermediate_size: 11008
+    max_seq_len: 4096
+    rope_theta: 1000000.0
+
+  vocab:
+    original_size: 151936
+    snac_codebook_size: 4096
+    snac_levels: 3
+    n_emotion_tags: 20
+    n_special_tokens: 9
+    total_new_tokens: 12317
+
+  speaker_encoder:
+    n_layers: 8
+    d_model: 1024
+    n_heads: 16
+    output_dim: 2048
+    pool_type: "cross_attention"
+
+  speaker_injection:
+    inject_every_n_layers: 4
+    n_injection_points: 9
+    d_model: 2048
+
+  detokenizer:
+    n_layers: 10
+    channels: 768
+    kernel_size: 7
+    dilations: [1, 2, 4, 8, 16, 1, 2, 4, 8, 16]
+    activation: "snake"
+    window_size: 16
+    sample_rate: 24000
+    upsample_rates: [8, 5, 4, 2]
+
+  codec:
+    model: "hubertsiuzdak/snac_24khz"
+    sample_rate: 24000
+    codebook_size: 4096
+    n_levels: 3
+    frame_rates: [12, 23, 47]
+    tokens_per_frame: 7

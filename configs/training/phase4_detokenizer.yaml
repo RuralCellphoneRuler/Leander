@@ -1,0 +1,52 @@
+# Phase 4: Streaming detokenizer training
+training:
+  phase: 4
+  name: "detokenizer"
+
+  model_config: "configs/model/leander_m.yaml"
+
+  data:
+    train_manifest: "data/processed/train_manifest.jsonl"
+    val_manifest: "data/processed/val_manifest.jsonl"
+    max_audio_duration: 15.0
+    min_audio_duration: 2.0
+    num_workers: 8
+
+  optimizer:
+    type: "adamw"
+    lr: 2.0e-4
+    betas: [0.8, 0.99]
+    weight_decay: 0.01
+
+  scheduler:
+    type: "cosine"
+    warmup_steps: 1000
+
+  batch_size: 16
+  gradient_accumulation_steps: 4
+  max_steps: 80000
+  max_grad_norm: 1.0
+  bf16: true
+
+  loss:
+    multi_scale_stft_weight: 1.0
+    adversarial_weight: 1.0
+    feature_matching_weight: 2.0
+    mel_weight: 45.0
+
+  # HiFi-GAN discriminator config
+  discriminator:
+    type: "multi_period_multi_scale"
+    mpd_periods: [2, 3, 5, 7, 11]
+    msd_scales: [1, 2, 4]
+
+  checkpoint:
+    save_every_steps: 5000
+    save_dir: "checkpoints/phase4"
+    keep_last_n: 3
+
+  logging:
+    wandb_project: "leander-tts"
+    wandb_run_name: "phase4-detokenizer"
+    log_every_steps: 50
+    eval_every_steps: 2000

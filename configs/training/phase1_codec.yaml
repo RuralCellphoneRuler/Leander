@@ -1,0 +1,51 @@
+# Phase 1: SNAC codec fine-tuning on German speech
+training:
+  phase: 1
+  name: "codec_finetune"
+
+  model_config: "configs/model/leander_m.yaml"
+
+  data:
+    train_dirs:
+      - "data/raw/mls_german/train"
+      - "data/raw/commonvoice_de/train"
+    val_dirs:
+      - "data/raw/mls_german/dev"
+      - "data/raw/commonvoice_de/dev"
+    sample_rate: 24000
+    max_audio_duration: 15.0
+    min_audio_duration: 1.0
+    num_workers: 8
+
+  optimizer:
+    type: "adamw"
+    lr: 1.0e-4
+    betas: [0.8, 0.99]
+    weight_decay: 0.01
+
+  scheduler:
+    type: "cosine"
+    warmup_steps: 1000
+
+  batch_size: 16
+  gradient_accumulation_steps: 4
+  max_steps: 50000
+  max_grad_norm: 1.0
+  bf16: true
+
+  loss:
+    reconstruction_weight: 1.0
+    commitment_weight: 0.25
+    codebook_weight: 1.0
+    multi_scale_stft_weight: 1.0
+
+  checkpoint:
+    save_every_steps: 5000
+    save_dir: "checkpoints/phase1"
+    keep_last_n: 3
+
+  logging:
+    wandb_project: "leander-tts"
+    wandb_run_name: "phase1-codec"
+    log_every_steps: 50
+    eval_every_steps: 2000

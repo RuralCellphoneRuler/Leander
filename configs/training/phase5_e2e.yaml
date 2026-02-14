@@ -1,0 +1,56 @@
+# Phase 5: End-to-end optimization
+training:
+  phase: 5
+  name: "e2e_optimization"
+
+  model_config: "configs/model/leander_m.yaml"
+
+  data:
+    train_manifest: "data/processed/hq_train_manifest.jsonl"  # high-quality subset
+    val_manifest: "data/processed/val_manifest.jsonl"
+    max_audio_duration: 15.0
+    min_audio_duration: 2.0
+    num_workers: 8
+
+  # Load from previous phases
+  pretrained:
+    lm_checkpoint: "checkpoints/phase3/best.pt"
+    detokenizer_checkpoint: "checkpoints/phase4/best.pt"
+    speaker_encoder_checkpoint: "checkpoints/phase2/best.pt"
+    codec_checkpoint: "checkpoints/phase1/best.pt"
+
+  optimizer:
+    type: "adamw"
+    lr: 1.0e-5
+    betas: [0.9, 0.95]
+    weight_decay: 0.01
+
+  scheduler:
+    type: "cosine"
+    warmup_steps: 500
+
+  batch_size: 4
+  gradient_accumulation_steps: 16
+  max_steps: 10000
+  max_grad_norm: 0.5
+  bf16: true
+
+  # Freeze detokenizer, fine-tune LM + speaker encoder
+  freeze:
+    detokenizer: true
+    codec: true
+
+  loss:
+    mel_reconstruction_weight: 1.0
+    speaker_consistency_weight: 0.5
+
+  checkpoint:
+    save_every_steps: 2000
+    save_dir: "checkpoints/phase5"
+    keep_last_n: 3
+
+  logging:
+    wandb_project: "leander-tts"
+    wandb_run_name: "phase5-e2e"
+    log_every_steps: 50
+    eval_every_steps: 500
